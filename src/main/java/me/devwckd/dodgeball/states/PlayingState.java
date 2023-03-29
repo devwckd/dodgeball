@@ -25,8 +25,9 @@ public class PlayingState extends AbstractState {
     private int elapsed = 0;
     private TeamMembers winner = null;
 
-    public PlayingState(final @NotNull Set<Player> players) {
+    public PlayingState(final @NotNull List<Player> players) {
         int index = 0;
+        Collections.shuffle(players);
         for (Player player : players) {
             final Team team = Team.values()[index];
             final TeamMembers teamMembers = getTeamMembers(team);
