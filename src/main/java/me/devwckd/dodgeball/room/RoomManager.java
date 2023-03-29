@@ -60,11 +60,12 @@ public class RoomManager {
         } catch (MongoException e) {
             throw new RoomException("A room with this id already exists.");
         }
-        roomCache.insert(room);
-
         if (room.getWorld() == null) {
             room.ensureWorldCreated(plugin);
         }
+
+        roomCache.insert(room);
+
         if(!room.getGame().isStarted()) {
             room.start();
         }
