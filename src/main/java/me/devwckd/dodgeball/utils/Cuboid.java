@@ -31,8 +31,6 @@ public class Cuboid {
     public boolean intersects(Vector vector) {
         if(vector.getX() > upperPoint.getX() || vector.getX() < lowerPoint.getX()) return false;
         if(vector.getY() > upperPoint.getY() || vector.getY() < lowerPoint.getY()) return false;
-        if(vector.getZ() > upperPoint.getZ() || vector.getZ() < lowerPoint.getZ()) return false;
-
-        return true;
+        return !(vector.getZ() > upperPoint.getZ()) && !(vector.getZ() < lowerPoint.getZ());
     }
 }
