@@ -63,8 +63,8 @@ public class EndingState extends AbstractState {
 
     @Override
     public StateResult<DodgeballContext> stop(DodgeballContext context) {
-        winners.forEach(this::quit);
-        spectators.forEach(this::quit);
+        winners.iterator().forEachRemaining(this::quit);
+        spectators.iterator().forEachRemaining(this::quit);
         scoreboards.forEach(FastBoard::delete);
         scoreboards.clear();
         return StateResult.none();
