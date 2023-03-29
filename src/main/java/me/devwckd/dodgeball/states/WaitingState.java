@@ -2,6 +2,7 @@ package me.devwckd.dodgeball.states;
 
 import com.google.common.collect.Iterators;
 import fr.mrmicky.fastboard.FastBoard;
+import lombok.RequiredArgsConstructor;
 import me.devwckd.dodgeball.arena.Arena;
 import me.devwckd.dodgeball.context.DodgeballContext;
 import me.devwckd.dodgeball.game.StateResult;
@@ -17,13 +18,19 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@RequiredArgsConstructor
 public class WaitingState extends AbstractJoinableState {
 
-    private final Set<Player> players = new HashSet<>();
+    private final Set<Player> players;
     private final Set<FastBoard> scoreboards = new HashSet<>();
+
+    public WaitingState() {
+        this(new HashSet<>());
+    }
 
     @Override
     public StateResult<DodgeballContext> start(DodgeballContext context) {
+        players.forEach(this::createScoreboard);
         for (Item item : context.getRoom().getWorld().getEntitiesByClass(Item.class)) {
             item.remove();
         }

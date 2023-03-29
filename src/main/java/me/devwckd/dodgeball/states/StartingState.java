@@ -35,7 +35,7 @@ public class StartingState extends AbstractJoinableState {
     @Override
     public StateResult<DodgeballContext> update(DodgeballContext context) {
         if(getPlayerCount() < 2) {
-            return StateResult.next(new WaitingState());
+            return StateResult.next(new WaitingState(players));
         }
 
         if(timeRemaining <= 0) {
