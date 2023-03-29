@@ -62,7 +62,7 @@ public class RoomManager {
         }
         roomCache.insert(room);
 
-        if (room.getWorld() != null) {
+        if (room.getWorld() == null) {
             room.ensureWorldCreated(plugin);
         }
         if(!room.getGame().isStarted()) {
