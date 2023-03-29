@@ -55,8 +55,6 @@ public class StartingState extends AbstractJoinableState {
 
     @Override
     public StateResult<DodgeballContext> stop(DodgeballContext context) {
-        players.forEach(Player::resetTitle);
-        players.clear();
         scoreboards.forEach(FastBoard::delete);
         scoreboards.clear();
         return StateResult.none();
