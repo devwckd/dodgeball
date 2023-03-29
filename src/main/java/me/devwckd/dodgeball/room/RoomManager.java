@@ -35,22 +35,23 @@ public class RoomManager {
         this.arenaManager = arenaManager;
 
         for (RoomDefinition roomDefinition : roomDefinitionRepository.find()) {
-            final Room room;
             try {
-                room = roomDefinition.toRoom(plugin, arenaManager);
+                final Room room = roomDefinition.toRoom(plugin, arenaManager);
+                create(room);
             } catch (RoomException e) {
                 plugin.getLogger().warning(e.getMessage());
-                continue;
             }
-
-            room.ensureWorldCreated(plugin);
-            try {
-                roomCache.insert(room);
-            } catch (RoomException e) {
-                throw new RuntimeException(e);
-            }
-            room.start();
         }
+    }
+
+    public void create(final @NotNull Room room) throws RoomException {
+        room.ensureWorldCreated(plugin);
+        try {
+            roomCache.insert(room);
+        } catch (RoomException e) {
+            throw new RuntimeException(e);
+        }
+        room.start();
     }
 
     public void insert(final @NotNull Room room) throws RoomException {
@@ -63,6 +64,9 @@ public class RoomManager {
 
         if (room.getWorld() != null) {
             room.ensureWorldCreated(plugin);
+        }
+        if(!room.getGame().isStarted()) {
+            room.start();
         }
     }
 

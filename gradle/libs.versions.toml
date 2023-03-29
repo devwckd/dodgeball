@@ -8,6 +8,7 @@ lombok = "1.18.26"
 shadowJar = "7.1.2"
 minimessage = "4.13.0"
 mongodb = "4.9.0"
+placeholderApi = "2.11.3"
 spigot = "1.19.3-R0.1-SNAPSHOT"
 
 [libraries]
@@ -19,6 +20,7 @@ inventoryFramework = { module = "com.github.DevNatan:inventory-framework", versi
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "minimessage" }
 mongodb = { module = "org.mongodb:mongodb-driver-sync", version.ref = "mongodb" }
+placeholderApi = { module = "me.clip:placeholderapi", version.ref = "placeholderApi" }
 spigotApi = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
 
 [plugins]

@@ -1,6 +1,7 @@
 package me.devwckd.dodgeball.room;
 
 import lombok.Data;
+import me.devwckd.dodgeball.DodgeballPlugin;
 import me.devwckd.dodgeball.arena.Arena;
 import me.devwckd.dodgeball.context.DodgeballContext;
 import me.devwckd.dodgeball.game.Game;
@@ -14,7 +15,6 @@ import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.UUID;
@@ -31,7 +31,7 @@ public class Room {
         if (game.isStarted()) {
             game.end();
         }
-        game.start(new WaitingState(), new DodgeballContext(arena, this));
+        game.start(new WaitingState(), new DodgeballContext(arena, this, ((DodgeballPlugin) getGame().getPlugin()).getHistoryManager()));
     }
 
     public void ensureWorldCreated(final @NotNull JavaPlugin plugin) {

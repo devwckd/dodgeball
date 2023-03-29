@@ -1,5 +1,6 @@
 package me.devwckd.dodgeball;
 
+import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -57,6 +58,7 @@ public class DodgeballPlugin extends JavaPlugin {
         registerViews();
         registerCommands();
         registerListeners();
+        registerPlaceholders();
     }
 
     private void createFolders() {
@@ -83,7 +85,7 @@ public class DodgeballPlugin extends JavaPlugin {
               HistoryEntryCodec.INSTANCE,
               RoomDefinitionCodec.INSTANCE
             )
-          ))
+          )).applyConnectionString(new ConnectionString(getConfig().getString("mongo-url", "mongodb://localhost:27017")))
           .build());
     }
 
@@ -103,6 +105,12 @@ public class DodgeballPlugin extends JavaPlugin {
         pluginManager.registerEvents(new EditSessionListener(editSessionManager), this);
         pluginManager.registerEvents(new RoomListener(roomManager), this);
         pluginManager.registerEvents(new HistoryListener(historyManager), this);
+    }
+
+    private void registerPlaceholders() {
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new DodgeballPlaceholderExpansion(roomManager, historyManager).register();
+        }
     }
 
 }

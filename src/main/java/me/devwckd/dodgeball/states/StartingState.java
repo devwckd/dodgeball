@@ -6,6 +6,7 @@ import me.devwckd.dodgeball.arena.Arena;
 import me.devwckd.dodgeball.context.DodgeballContext;
 import me.devwckd.dodgeball.game.StateResult;
 import me.devwckd.dodgeball.game.State;
+import me.devwckd.dodgeball.history.HistoryEntry;
 import me.devwckd.dodgeball.utils.TimeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -14,15 +15,13 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class StartingState extends AbstractJoinableState {
 
-    private final Set<Player> players;
+    private final List<Player> players;
     private final Set<FastBoard> scoreboards = new HashSet<>();
     private int timeRemaining = 30;
 
@@ -119,5 +118,4 @@ public class StartingState extends AbstractJoinableState {
             scoreboard.updateLine(5, " §e" + getPlayerCount() + "/20 §fplayers ");
         });
     }
-
 }

@@ -5,6 +5,7 @@ import me.devwckd.dodgeball.room.Room;
 import me.devwckd.dodgeball.room.RoomManager;
 import me.devwckd.dodgeball.states.AbstractState;
 import me.devwckd.dodgeball.states.PlayingState;
+import me.devwckd.dodgeball.team.Team;
 import me.devwckd.dodgeball.utils.ItemUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -21,6 +22,7 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -48,6 +50,17 @@ public class RoomListener implements Listener {
         if (room == null) return;
         event.setDamage(0);
         event.setCancelled(true);
+
+        if (event.getEntity() instanceof Player player && event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+            if (room.getGame().getCurrentState() instanceof PlayingState playingState) {
+                final Team team = playingState.getTeam(player);
+                if (team == Team.BLUE) {
+                    player.teleport(room.getArena().getBlueTeamSpawn().toLocation(world));
+                } else {
+                    player.teleport(room.getArena().getRedTeamSpawn().toLocation(world));
+                }
+            }
+        }
     }
 
     @EventHandler
@@ -109,6 +122,14 @@ public class RoomListener implements Listener {
         if (room == null) return;
         if (room.getArena().getMiddleLine().intersects(event.getTo().toVector())) {
             event.setTo(event.getFrom());
+        }
+    }
+
+    @EventHandler
+    public void onRain(final @NotNull WeatherChangeEvent event) {
+        final Room room = roomManager.findByWorld(Objects.requireNonNull(event.getWorld()));
+        if (event.toWeatherState()) {
+            event.setCancelled(true);
         }
     }
 

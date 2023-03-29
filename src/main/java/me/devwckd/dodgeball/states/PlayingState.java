@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PlayingState extends AbstractState {
 
@@ -60,6 +61,8 @@ public class PlayingState extends AbstractState {
             }
             player.teleport(spawnLocation);
         }
+
+        spawnExtraBall(context);
 
         context.getArena().getMiddleBallSpawns().stream().map(vector -> vector.toLocation(world))
           .forEach(location -> world.dropItem(location, new ItemStack(Material.SNOWBALL)));
@@ -122,7 +125,7 @@ public class PlayingState extends AbstractState {
             player.setGameMode(GameMode.SPECTATOR);
             spectators.add(player);
             for (ItemStack content : player.getInventory().getContents()) {
-                if(content == null) continue;
+                if (content == null) continue;
                 player.getWorld().dropItem(player.getLocation(), content);
             }
             player.getInventory().clear();

@@ -1,5 +1,7 @@
 package me.devwckd.dodgeball.views;
 
+import me.devwckd.dodgeball.history.History;
+import me.devwckd.dodgeball.history.HistoryManager;
 import me.devwckd.dodgeball.room.Room;
 import me.devwckd.dodgeball.room.RoomManager;
 import me.devwckd.dodgeball.states.AbstractJoinableState;
@@ -7,7 +9,7 @@ import me.devwckd.dodgeball.utils.ItemUtils;
 import me.saiintbrisson.minecraft.PaginatedView;
 import me.saiintbrisson.minecraft.PaginatedViewSlotContext;
 import me.saiintbrisson.minecraft.ViewItem;
-import me.saiintbrisson.minecraft.Viewer;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -19,11 +21,12 @@ public class RoomListView extends PaginatedView<Room> {
 
     private final RoomManager roomManager;
 
-    public RoomListView(final @NotNull RoomManager roomManager) {
-        super(5, "Dodgeball Rooms:");
+    public RoomListView(final @NotNull RoomManager roomManager, final @NotNull HistoryManager historyManager) {
+        super(6, "Dodgeball Rooms:");
         this.roomManager = roomManager;
         scheduleUpdate(10);
         setLayout(
+          "XXXXHXXXX",
           "XXXXXXXXX",
           "XOOOOOOOX",
           "XOOOOOOOX",
@@ -31,6 +34,15 @@ public class RoomListView extends PaginatedView<Room> {
           "XXXXXXXXX"
         );
         setSource($ -> roomManager.getSortedRoomList());
+
+        setLayout('H', viewItem -> viewItem.onRender(context -> {
+            final History history = historyManager.findCachedById(context.getPlayer().getUniqueId());
+            if (history == null) {
+                context.setItem(new ItemStack(Material.STONE));
+            } else {
+                context.setItem(ItemUtils.createProfileHead(history));
+            }
+        }));
 
         setCancelOnClick(true);
         setCancelOnDrag(true);

@@ -22,6 +22,9 @@ repositories {
 
     // MiniMessage
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+
+    // PlaceholderAPI
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 }
 
 dependencies {
@@ -30,6 +33,7 @@ dependencies {
     compileOnly(libs.lombok)
     compileOnly(libs.minimessage)
     compileOnly(libs.spigotApi)
+    compileOnly(libs.placeholderApi)
 
     implementation(libs.commandFramework)
     implementation(libs.fastboard)
@@ -46,6 +50,7 @@ bukkit {
     main = "me.devwckd.dodgeball.DodgeballPlugin"
     apiVersion = "1.19"
     depend = listOf("FastAsyncWorldEdit")
+    softDepend = listOf("PlaceholderAPI")
 }
 
 tasks {

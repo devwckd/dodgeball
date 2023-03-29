@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public final class ItemUtils {
@@ -136,7 +137,7 @@ public final class ItemUtils {
 
     public static ItemStack createRoomItemStackAdmin(final @NotNull Room room) {
         final ItemStack itemStack = createRoomItemStack(room);
-        if(itemStack.getType() == Material.STONE) return itemStack;
+        if (itemStack.getType() == Material.STONE) return itemStack;
         final ItemMeta itemMeta = itemStack.getItemMeta();
         final List<String> lore = itemMeta.getLore();
         lore.add(" ");

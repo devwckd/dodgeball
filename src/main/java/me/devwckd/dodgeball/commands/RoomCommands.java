@@ -65,8 +65,9 @@ public class RoomCommands {
         final Room room = new Room(UUID.randomUUID(), arena, new Game<>(plugin));
         try {
             roomManager.insert(room);
-        } catch (RoomException ignored) {}
-        room.start();
+        } catch (RoomException e) {
+            player.sendMessage("§c§l[!] §eError: " + e.getMessage());
+        }
     }
 
 

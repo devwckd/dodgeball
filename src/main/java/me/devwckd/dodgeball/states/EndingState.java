@@ -4,6 +4,7 @@ import fr.mrmicky.fastboard.FastBoard;
 import lombok.RequiredArgsConstructor;
 import me.devwckd.dodgeball.context.DodgeballContext;
 import me.devwckd.dodgeball.game.StateResult;
+import me.devwckd.dodgeball.history.HistoryEntry;
 import me.devwckd.dodgeball.team.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -16,9 +17,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class EndingState extends AbstractState {

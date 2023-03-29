@@ -1,11 +1,7 @@
 package me.devwckd.dodgeball.codec;
 
 import lombok.RequiredArgsConstructor;
-import me.devwckd.dodgeball.DodgeballPlugin;
-import me.devwckd.dodgeball.arena.Arena;
-import me.devwckd.dodgeball.room.Room;
 import me.devwckd.dodgeball.room.RoomDefinition;
-import me.devwckd.dodgeball.room.RoomDefinitionRepository;
 import org.bson.BsonBinary;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;

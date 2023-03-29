@@ -1,31 +1,24 @@
 package me.devwckd.dodgeball.states;
 
-import com.google.common.collect.Iterators;
 import fr.mrmicky.fastboard.FastBoard;
 import lombok.RequiredArgsConstructor;
-import me.devwckd.dodgeball.arena.Arena;
 import me.devwckd.dodgeball.context.DodgeballContext;
 import me.devwckd.dodgeball.game.StateResult;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class WaitingState extends AbstractJoinableState {
 
-    private final Set<Player> players;
+    private final List<Player> players;
     private final Set<FastBoard> scoreboards = new HashSet<>();
 
     public WaitingState() {
-        this(new HashSet<>());
+        this(new ArrayList<>());
     }
 
     @Override
@@ -40,7 +33,7 @@ public class WaitingState extends AbstractJoinableState {
 
     @Override
     public StateResult<DodgeballContext> update(DodgeballContext context) {
-        if(getPlayerCount() >= 2) {
+        if (getPlayerCount() >= 2) {
             return StateResult.next(new StartingState(players));
         }
 
@@ -68,14 +61,14 @@ public class WaitingState extends AbstractJoinableState {
     public void quit(Player player) {
         players.remove(player);
         scoreboards.removeIf(scoreboard -> {
-            if(scoreboard.getPlayer().equals(player)) {
+            if (scoreboard.getPlayer().equals(player)) {
                 scoreboard.delete();
                 return true;
             }
             return false;
         });
 
-        if(player.isOnline()) {
+        if (player.isOnline()) {
             player.teleport(Objects.requireNonNull(Bukkit.getWorld("world")).getSpawnLocation());
         }
 
