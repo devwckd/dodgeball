@@ -2,14 +2,17 @@ package me.devwckd.dodgeball.utils;
 
 import me.devwckd.dodgeball.context.DodgeballContext;
 import me.devwckd.dodgeball.game.Game;
+import me.devwckd.dodgeball.history.History;
 import me.devwckd.dodgeball.room.Room;
 import me.devwckd.dodgeball.states.AbstractState;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -18,6 +21,34 @@ public final class ItemUtils {
 
     private ItemUtils() {
     }
+
+    public static ItemStack createProfileHead(final @NotNull History history) {
+        final long totalDeaths = history.getTotalDeaths();
+        final long totalKills = history.getTotalKills();
+        final long totalGames = history.getTotalGames();
+        final long totalWins = history.getTotalWins();
+
+        final ItemStack itemStack = new ItemStack(Material.PLAYER_HEAD);
+        final SkullMeta skullMeta = (SkullMeta) itemStack.getItemMeta();
+        skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(history.getId()));
+        skullMeta.setDisplayName("§a§l[»] " + history.getNickname());
+        skullMeta.setLore(List.of(
+          " ",
+          " §fWin Rate: §e" + String.format("%.2f", NumberUtils.percentage(totalWins, totalGames) * 100D) + "% ",
+          " §fK/D Ratio: §c" + String.format("%.2f", NumberUtils.percentage(totalKills, totalDeaths)) + " ",
+          " ",
+          " §fTotal Kills: §a" + totalKills + " ",
+          " §fTotal Deaths: §a" + totalDeaths + " ",
+          " ",
+          " §fTotal Wins: §a" + totalWins + " ",
+          " §fTotal Games: §a" + totalGames + " ",
+          " "
+        ));
+        itemStack.setItemMeta(skullMeta);
+        return itemStack;
+    }
+
+
 
     public static ItemStack createRoomItemStack(final @NotNull Room room) {
         final Game<DodgeballContext> game = room.getGame();

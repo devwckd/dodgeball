@@ -3,12 +3,11 @@ package me.devwckd.dodgeball.states;
 import fr.mrmicky.fastboard.FastBoard;
 import me.devwckd.dodgeball.context.DodgeballContext;
 import me.devwckd.dodgeball.game.StateResult;
+import me.devwckd.dodgeball.history.HistoryEntry;
 import me.devwckd.dodgeball.team.Team;
 import me.devwckd.dodgeball.team.TeamMembers;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import me.devwckd.dodgeball.utils.ItemUtils;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +20,7 @@ public class PlayingState extends AbstractState {
     private final Set<FastBoard> scoreboards = new HashSet<>();
     private final TeamMembers redTeamMembers = new TeamMembers(Team.RED);
     private final TeamMembers blueTeamMembers = new TeamMembers(Team.BLUE);
-    private final Map<Player, Team> teamByPlayer = new HashMap<>();
+    private final Map<Player, Team> teamsByPlayer = new HashMap<>();
 
     private int elapsed = 0;
     private TeamMembers winner = null;
@@ -32,7 +31,7 @@ public class PlayingState extends AbstractState {
             final Team team = Team.values()[index];
             final TeamMembers teamMembers = getTeamMembers(team);
             teamMembers.addPlayer(player);
-            teamByPlayer.put(player, team);
+            teamsByPlayer.put(player, team);
             index++;
             if (index >= Team.values().length) {
                 index = 0;
@@ -64,6 +63,8 @@ public class PlayingState extends AbstractState {
         context.getArena().getMiddleBallSpawns().stream().map(vector -> vector.toLocation(world))
           .forEach(location -> world.dropItem(location, new ItemStack(Material.SNOWBALL)));
 
+        applyPlayHistories();
+
         return StateResult.none();
     }
 
@@ -88,17 +89,17 @@ public class PlayingState extends AbstractState {
 
     @Override
     public boolean hasJoined(final @NotNull Player player) {
-        return teamByPlayer.containsKey(player);
+        return teamsByPlayer.containsKey(player);
     }
 
     @Override
     public int getPlayerCount() {
-        return teamByPlayer.size();
+        return teamsByPlayer.size();
     }
 
     @Override
     public Collection<Player> getPlayers() {
-        return teamByPlayer.keySet();
+        return teamsByPlayer.keySet();
     }
 
     @Override
@@ -177,7 +178,7 @@ public class PlayingState extends AbstractState {
     }
 
     public @NotNull Team getTeam(final @NotNull Player player) {
-        final Team team = teamByPlayer.get(player);
+        final Team team = teamsByPlayer.get(player);
         if (team == null) throw new RuntimeException(player.getName() + " doesn't have a team!");
         return team;
     }
@@ -187,7 +188,54 @@ public class PlayingState extends AbstractState {
         final Team killedTeam = getTeam(killed);
         if (killerTeam == killedTeam) return;
         broadcastMessage("§c§l[⚔] " + killerTeam.getColor() + killer.getName() + " §7eliminated " + killedTeam.getColor() + killed.getName());
+        applyKillDeathHistory(killer, killed);
         quit(killed);
+    }
+
+    private void applyPlayHistories() {
+        final long now = System.currentTimeMillis();
+        final DodgeballContext context = getGame().getContext();
+        context.getHistoryManager().addEntryBatch(teamsByPlayer
+          .entrySet()
+          .stream()
+          .map(entry -> Map.<UUID, List<HistoryEntry>>entry(entry.getKey().getUniqueId(), Collections.singletonList(new HistoryEntry.PlayEntry(now, context.getArena().getDisplayName(), entry.getValue()))))
+          .collect(Collectors.<Map.Entry<UUID, List<HistoryEntry>>, UUID, List<HistoryEntry>>toMap(Map.Entry::getKey, Map.Entry::getValue))
+        );
+    }
+
+    private void applyKillDeathHistory(final @NotNull Player killer, final @NotNull Player killed) {
+        final long now = System.currentTimeMillis();
+        final DodgeballContext context = getGame().getContext();
+
+        final Map<UUID, List<HistoryEntry>> map = new HashMap<>();
+        map.put(killer.getUniqueId(), Collections.singletonList(new HistoryEntry.KillEntry(now, killed.getUniqueId(), killed.getName(), context.getArena().getDisplayName(), getTeam(killer))));
+        map.put(killed.getUniqueId(), Collections.singletonList(new HistoryEntry.DeathEntry(now, killer.getUniqueId(), killer.getName(), context.getArena().getDisplayName(), getTeam(killed))));
+        context.getHistoryManager().addEntryBatch(map);
+    }
+
+    private void spawnExtraBall(DodgeballContext context) {
+        if(redTeamMembers.getPlayerCount() > blueTeamMembers.getPlayerCount()) {
+            ItemUtils.spawnSnowball(context.getArena().getBlueBallSpawn().toLocation(context.getRoom().getWorld()));
+            for (Player player : blueTeamMembers.getPlayers()) {
+                player.sendMessage("§9§l[!] §7Your team received an extra ball for being in numeric disadvantage.");
+                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+            }
+        }
+        if(blueTeamMembers.getPlayerCount() > redTeamMembers.getPlayerCount()) {
+            ItemUtils.spawnSnowball(context.getArena().getRedTeamSpawn().toLocation(context.getRoom().getWorld()));
+            for (Player player : blueTeamMembers.getPlayers()) {
+                player.sendMessage("§c§l[!] §7Your team received an extra ball for being in numeric disadvantage.");
+                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+            }
+        }
+    }
+
+    public int getBlueTeamMemberCount() {
+        return blueTeamMembers.getPlayerCount();
+    }
+
+    public int getRedTeamMemberCount() {
+        return redTeamMembers.getPlayerCount();
     }
 
 }

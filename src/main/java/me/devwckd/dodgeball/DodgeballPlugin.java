@@ -8,12 +8,18 @@ import me.devwckd.dodgeball.arena.ArenaCache;
 import me.devwckd.dodgeball.arena.ArenaManager;
 import me.devwckd.dodgeball.arena.ArenaRepository;
 import me.devwckd.dodgeball.codec.ArenaCodec;
+import me.devwckd.dodgeball.codec.HistoryCodec;
+import me.devwckd.dodgeball.codec.HistoryEntryCodec;
 import me.devwckd.dodgeball.codec.RoomDefinitionCodec;
 import me.devwckd.dodgeball.commands.DodgeballCommands;
 import me.devwckd.dodgeball.commands.EditCommands;
 import me.devwckd.dodgeball.commands.RoomCommands;
 import me.devwckd.dodgeball.edit_session.EditSessionManager;
+import me.devwckd.dodgeball.history.HistoryCache;
+import me.devwckd.dodgeball.history.HistoryManager;
+import me.devwckd.dodgeball.history.HistoryRepository;
 import me.devwckd.dodgeball.listener.EditSessionListener;
+import me.devwckd.dodgeball.listener.HistoryListener;
 import me.devwckd.dodgeball.listener.RoomListener;
 import me.devwckd.dodgeball.room.RoomCache;
 import me.devwckd.dodgeball.room.RoomDefinitionRepository;
@@ -34,6 +40,7 @@ public class DodgeballPlugin extends JavaPlugin {
     private EditSessionManager editSessionManager;
     private ArenaManager arenaManager;
     private RoomManager roomManager;
+    private HistoryManager historyManager;
 
     private ViewFrame viewFrame;
 
@@ -42,6 +49,7 @@ public class DodgeballPlugin extends JavaPlugin {
         createFolders();
         connectToMongoDB();
 
+        historyManager = new HistoryManager(new HistoryCache(), new HistoryRepository(mongoClient));
         editSessionManager = new EditSessionManager(this);
         arenaManager = new ArenaManager(new ArenaCache(), new ArenaRepository(mongoClient));
         roomManager = new RoomManager(this, new RoomCache(), new RoomDefinitionRepository(mongoClient), arenaManager);
@@ -71,6 +79,8 @@ public class DodgeballPlugin extends JavaPlugin {
             MongoClientSettings.getDefaultCodecRegistry(),
             CodecRegistries.fromCodecs(
               ArenaCodec.INSTANCE,
+              HistoryCodec.INSTANCE,
+              HistoryEntryCodec.INSTANCE,
               RoomDefinitionCodec.INSTANCE
             )
           ))
@@ -78,7 +88,7 @@ public class DodgeballPlugin extends JavaPlugin {
     }
 
     private void registerViews() {
-        viewFrame = ViewFrame.of(this, new RoomListView(roomManager)).register();
+        viewFrame = ViewFrame.of(this, new RoomListView(roomManager, historyManager)).register();
     }
 
     private void registerCommands() {
@@ -92,6 +102,7 @@ public class DodgeballPlugin extends JavaPlugin {
         final PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new EditSessionListener(editSessionManager), this);
         pluginManager.registerEvents(new RoomListener(roomManager), this);
+        pluginManager.registerEvents(new HistoryListener(historyManager), this);
     }
 
 }

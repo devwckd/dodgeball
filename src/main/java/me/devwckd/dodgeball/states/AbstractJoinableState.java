@@ -28,7 +28,6 @@ public abstract class AbstractJoinableState extends AbstractState implements Sco
         updateScoreboards();
         createScoreboard(player);
 
-
         return AbstractJoinableState.JoinResult.SUCCESS;
     }
 

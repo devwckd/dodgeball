@@ -31,6 +31,7 @@ public class EndingState extends AbstractState {
 
     @Override
     public StateResult<DodgeballContext> start(DodgeballContext context) {
+        applyWinHistories();
         for (Player winner : winners) {
             createScoreboard(winner);
         }
@@ -70,7 +71,8 @@ public class EndingState extends AbstractState {
     }
 
     @Override
-    public void updateScoreboards() {}
+    public void updateScoreboards() {
+    }
 
     @Override
     public void createScoreboard(Player player) {
@@ -114,5 +116,15 @@ public class EndingState extends AbstractState {
         player.setGameMode(GameMode.SURVIVAL);
         player.teleport(config.getLocation("exit-location", Bukkit.getWorlds().get(0).getSpawnLocation()));
         player.resetTitle();
+    }
+
+    private void applyWinHistories() {
+        final long now = System.currentTimeMillis();
+        final DodgeballContext context = getGame().getContext();
+        context.getHistoryManager().addEntryBatch(winners
+          .stream()
+          .map(player -> Map.<UUID, List<HistoryEntry>>entry(player.getUniqueId(), Collections.singletonList(new HistoryEntry.WinEntry(now, context.getArena().getDisplayName(), team))))
+          .collect(Collectors.<Map.Entry<UUID, List<HistoryEntry>>, UUID, List<HistoryEntry>>toMap(Map.Entry::getKey, Map.Entry::getValue))
+        );
     }
 }
