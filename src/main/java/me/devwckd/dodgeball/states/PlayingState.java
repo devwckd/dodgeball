@@ -10,6 +10,7 @@ import me.devwckd.dodgeball.utils.ItemUtils;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -54,10 +55,12 @@ public class PlayingState extends AbstractState {
 
             final Location spawnLocation;
             final Team team = getPlayerTeamMembers(player).getTeam();
+            final Vector blueTeamSpawn = context.getArena().getBlueTeamSpawn();
+            final Vector redTeamSpawn = context.getArena().getRedTeamSpawn();
             if (team == Team.RED) {
-                spawnLocation = context.getArena().getRedTeamSpawn().toLocation(world);
+                spawnLocation = redTeamSpawn.toLocation(world).setDirection(redTeamSpawn.subtract(blueTeamSpawn));
             } else {
-                spawnLocation = context.getArena().getBlueTeamSpawn().toLocation(world);
+                spawnLocation = blueTeamSpawn.toLocation(world).setDirection(blueTeamSpawn.subtract(redTeamSpawn));
             }
             player.teleport(spawnLocation);
         }

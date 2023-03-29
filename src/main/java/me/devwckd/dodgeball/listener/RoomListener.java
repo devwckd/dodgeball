@@ -120,7 +120,7 @@ public class RoomListener implements Listener {
     public void onPlayerMove(final @NotNull PlayerMoveEvent event) {
         final Room room = roomManager.findByWorld(Objects.requireNonNull(event.getTo().getWorld()));
         if (room == null) return;
-        if (room.getArena().getMiddleLine().intersects(event.getTo().toVector())) {
+        if (room.getGame().getCurrentState() instanceof PlayingState && room.getArena().getMiddleLine().intersects(event.getTo().toVector())) {
             event.setTo(event.getFrom());
         }
     }
