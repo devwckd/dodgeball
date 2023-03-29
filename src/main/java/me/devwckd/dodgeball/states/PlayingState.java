@@ -58,9 +58,9 @@ public class PlayingState extends AbstractState {
             final Vector blueTeamSpawn = context.getArena().getBlueTeamSpawn();
             final Vector redTeamSpawn = context.getArena().getRedTeamSpawn();
             if (team == Team.RED) {
-                spawnLocation = redTeamSpawn.toLocation(world).setDirection(blueTeamSpawn.subtract(redTeamSpawn));
+                spawnLocation = redTeamSpawn.toLocation(world).setDirection(blueTeamSpawn.clone().subtract(redTeamSpawn));
             } else {
-                spawnLocation = blueTeamSpawn.toLocation(world).setDirection(redTeamSpawn.subtract(blueTeamSpawn));
+                spawnLocation = blueTeamSpawn.toLocation(world).setDirection(redTeamSpawn.clone().subtract(blueTeamSpawn));
             }
             player.teleport(spawnLocation);
         }
